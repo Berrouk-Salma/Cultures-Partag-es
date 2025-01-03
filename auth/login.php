@@ -1,23 +1,22 @@
 <?php
+session_start();
 require_once '../classes/database.php';
 require_once '../classes/user.php';
 
-session_start();
-
-$error = '';
-$success = '';
-
-// Check if form is submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $password = $_POST['password'];
     
     $user = new User();
-    if ($user->login($email, $password)) {
+    $result = $user->login($email, $password);
+    
+    if ($result) {
+        $_SESSION['user_id'] = $result['id'];
+        $_SESSION['role'] = $result['role'];
         header('Location: ../index.php');
         exit();
     } else {
-        $error = 'Email ou mot de passe incorrect';
+        $error = "Email ou mot de passe incorrect";
     }
 }
 ?>
@@ -32,31 +31,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-gray-900">Connexion</h2>
-                <p class="mt-2 text-gray-600">Accédez à votre compte ArtCulture</p>
+        <div class="max-w-md w-full space-y-8 p-8 bg-white shadow-lg rounded-lg">
+            <div>
+                <h2 class="text-center text-3xl font-bold text-gray-900">Connexion</h2>
             </div>
-
-            <?php if($error): ?>
+            <?php if (isset($error)): ?>
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-
-            <form class="mt-8 space-y-6" method="POST" action="">
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" name="email" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <form class="mt-8 space-y-6" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                        <input type="password" name="password" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
                 </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                    <input type="password" id="password" name="password" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
                 <div>
                     <button type="submit" 
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -64,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </button>
                 </div>
             </form>
-
             <div class="text-center mt-4">
                 <p class="text-sm text-gray-600">
                     Pas encore de compte? 

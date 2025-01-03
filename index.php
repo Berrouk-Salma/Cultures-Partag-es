@@ -2,55 +2,21 @@
 require_once './classes/database.php';
 require_once './classes/article.php';
 require_once './classes/category.php';
-require_once './classes/user.php';
-
-session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ./auth/login.php');
-    exit();
-}
-
-
-$userRole = $_SESSION['role'];
 
 
 $articleObj = new Article();
 $categoryObj = new Category();
-$userObj = new User();
 
-$userData = $userObj->getById($_SESSION['user_id']);
 
-// Check user role and redirect accordingly
-switch($userRole) {
-    case 'admin':
-        // Admin can access everything
-        break;
-    case 'author':
-        // Authors can access their articles and create new ones
-        break;
-    case 'user':
-        // Regular users can only view content
-        break;
-    default:
-        // If role not valid, logout and redirect
-        session_destroy();
-        header('Location: auth/login.php');
-        exit();
-}
+$latestArticles = $articleObj->getAll(); 
 
-// Get latest articles based on user role
-if ($userRole === 'admin') {
-    $latestArticles = $articleObj->getAll();
-} elseif ($userRole === 'author') {
-    $latestArticles = $articleObj->getUserArticles($_SESSION['user_id']);
-} else {
-    $latestArticles = $articleObj->getPublished();
-}
 
-// Get all categories
 $categories = $categoryObj->getAll();
+
+
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userRole = $isLoggedIn ? $_SESSION['role'] : null;
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +28,7 @@ $categories = $categoryObj->getAll();
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Navigation -->
+  
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
@@ -90,12 +56,11 @@ $categories = $categoryObj->getAll();
         </div>
     </nav>
 
-    <!-- Hero Section -->
+   
     <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-20">
-        <!-- Hero content remains the same -->
+       
     </div>
 
-    <!-- Featured Categories -->
     <div class="max-w-7xl mx-auto px-4 py-16">
         <h2 class="text-3xl font-bold text-center mb-12">Explorez nos Catégories</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
