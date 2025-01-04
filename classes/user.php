@@ -6,23 +6,25 @@ class User {
         $this->db = new Database();
     }
 
-    public function register($name, $email, $password) {
+    public function create($userData) {
         try {
-            // Hash password
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+          
+            $hashedPassword = password_hash($userData['password'], PASSWORD_DEFAULT);
             
-            $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
+            $sql = "INSERT INTO users (name, email, password, role) 
+                   VALUES (:name, :email, :password, :role)";
+                   
             $stmt = $this->db->prepare($sql);
             
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':name', $userData['name']);
+            $stmt->bindParam(':email', $userData['email']);
             $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':role', $userData['role']);
             
-            $stmt->execute();
-            return $this->db->lastInsertId();
+            return $stmt->execute();
             
         } catch(PDOException $e) {
-            error_log("Error in register: " . $e->getMessage());
+            error_log("Error in create: " . $e->getMessage());
             return false;
         }
     }

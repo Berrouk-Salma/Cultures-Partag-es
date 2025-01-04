@@ -6,6 +6,7 @@ class Article {
         $this->db = new Database();
     }
 
+    // Créer un article
     public function create($title, $content, $user_id, $category_id) {
         try {
             $sql = "INSERT INTO articles (title, content, user_id, category_id) 
@@ -17,41 +18,22 @@ class Article {
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':category_id', $category_id);
             
-            $stmt->execute();
-            return $this->db->lastInsertId();
+            return $stmt->execute();
         } catch(PDOException $e) {
             error_log("Error creating article: " . $e->getMessage());
             return false;
         }
     }
 
-    public function getAll($limit = null, $category_id = null) {
+    // Récupérer tous les articles
+    public function getAll() {
         try {
             $sql = "SELECT a.*, c.name as category_name, u.name as author_name 
                     FROM articles a 
                     LEFT JOIN categories c ON a.category_id = c.id 
                     LEFT JOIN users u ON a.user_id = u.id 
-                    WHERE a.is_published = 1";
-            
-            if ($category_id) {
-                $sql .= " AND a.category_id = :category_id";
-            }
-            
-            $sql .= " ORDER BY a.published_at DESC";
-            
-            if ($limit) {
-                $sql .= " LIMIT :limit";
-            }
-            
+                    ORDER BY a.created_at DESC";
             $stmt = $this->db->prepare($sql);
-            
-            if ($category_id) {
-                $stmt->bindParam(':category_id', $category_id);
-            }
-            if ($limit) {
-                $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            }
-            
             $stmt->execute();
             return $stmt->fetchAll();
         } catch(PDOException $e) {
@@ -60,6 +42,7 @@ class Article {
         }
     }
 
+    // Récupérer un article par ID
     public function getById($id) {
         try {
             $sql = "SELECT a.*, c.name as category_name, u.name as author_name 
@@ -77,6 +60,7 @@ class Article {
         }
     }
 
+    // Modifier un article
     public function update($id, $data, $user_id) {
         try {
             $sets = [];
@@ -100,6 +84,7 @@ class Article {
         }
     }
 
+    // Supprimer un article
     public function delete($id, $user_id) {
         try {
             $sql = "DELETE FROM articles WHERE id = :id AND user_id = :user_id";
@@ -113,19 +98,51 @@ class Article {
         }
     }
 
-    public function publish($id, $admin_id) {
+    // Approuver un article
+    public function approve($article_id) {
         try {
-            $sql = "UPDATE articles SET is_published = 1, published_at = CURRENT_TIMESTAMP 
-                    WHERE id = :id";
+            $sql = "UPDATE articles SET is_published = 1, published_at = CURRENT_TIMESTAMP WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':id', $article_id);
             return $stmt->execute();
         } catch(PDOException $e) {
-            error_log("Error publishing article: " . $e->getMessage());
+            error_log("Error approving article: " . $e->getMessage());
             return false;
         }
     }
 
+    // Rejeter un article
+    public function reject($article_id) {
+        try {
+            $sql = "UPDATE articles SET is_published = 0 WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $article_id);
+            return $stmt->execute();
+        } catch(PDOException $e) {
+            error_log("Error rejecting article: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Articles en attente
+    public function getPendingArticles() {
+        try {
+            $sql = "SELECT a.*, c.name as category_name, u.name as author_name 
+                    FROM articles a 
+                    LEFT JOIN categories c ON a.category_id = c.id 
+                    LEFT JOIN users u ON a.user_id = u.id 
+                    WHERE a.is_published = 0 
+                    ORDER BY a.created_at DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch(PDOException $e) {
+            error_log("Error getting pending articles: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Articles d'un utilisateur
     public function getUserArticles($user_id) {
         try {
             $sql = "SELECT a.*, c.name as category_name 

@@ -1,9 +1,9 @@
 <?php
 class Database extends PDO {
-    private $host = "localhost";
-    private $dbname = "artculture";
-    private $user = "root";
-    private $pass = "";
+    private $host = "localhost"; // Typically localhost
+    private $dbname = "art_culture_db"; // Nom de ta base de données
+    private $user = "root";     // Ton nom d'utilisateur MySQL (par défaut root)
+    private $pass = "";         // Ton mot de passe MySQL (vide par défaut en local)
 
     public function __construct() {
         try {
