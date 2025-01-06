@@ -127,4 +127,18 @@ class Category {
             return false;
         }
     }
+
+    public function getCategorie(int $id): array {
+        try {
+            $sql = "SELECT id, name FROM categories WHERE user_id = :user_id";
+            $stmt = $this->database->getConnection()->prepare($sql);
+            $stmt->bindParam(':user_id', $_SESSION['id_user'], PDO::PARAM_INT);
+            $stmt->execute();
+            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $categories;
+        } catch(PDOException $e) {
+            $this->logError('exists', $e->getMessage());
+            return [];
+        }
+    }
 }

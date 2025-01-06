@@ -1,14 +1,17 @@
 <?php
-// views/auteur/dashboard.php
 session_start();
 
 require_once '../../classes/Article.php';
+require_once '../../classes/category.php';
 
 
 
 // Get author's articles
 $article = new Article();
 $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
+
+$category = new Category();
+$categories = $category->getCategorie($_SESSION['id_user']);
 ?>
 
 <!DOCTYPE html>
@@ -42,8 +45,7 @@ $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
            class="flex items-center px-4 py-2.5 bg-indigo-900 rounded-lg">
             <i class="fas fa-tags mr-3"></i>
             Mes Catégories
-        </a>
-                    
+        </a>  
                     <a href="add-article.php" 
                        class="flex items-center px-4 py-2.5 text-indigo-200 hover:bg-indigo-700 rounded-lg transition-colors">
                         <i class="fas fa-plus-circle mr-3"></i>
@@ -51,7 +53,6 @@ $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
                     </a>
                 </div>
             </nav>
-            
             <div class="px-6 py-4 border-t border-indigo-700">
                 <div class="flex items-center">
                     <i class="fas fa-user-circle text-2xl mr-3"></i>
@@ -73,16 +74,18 @@ $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
             <header class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-gray-900">Mes Articles</h1>
-                    <a href="add-article.php" 
-                       class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors flex items-center">
-                        <i class="fas fa-plus mr-2"></i>
-                        Nouvel Article
-                    </a>
+                    <div class=" flex flex-row gap-2">
+                    <button onclick="document.getElementById('articleModal').classList.remove('hidden')"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors flex items-center">
+    <i class="fas fa-plus mr-2"></i>
+    Nouvel Article
+</button>
                     <button onclick="document.getElementById('categoryModal').classList.remove('hidden')"
         class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors flex items-center">
     <i class="fas fa-plus mr-2"></i>
     Nouvelle Catégorie
 </button>
+</div>
                 </div>
             </header>
 
@@ -106,47 +109,90 @@ $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
                     </div>
                 <?php endif; ?>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <?php if ($articles && count($articles) > 0): ?>
-                        <?php foreach ($articles as $article): ?>
-                            <div class="bg-white rounded-lg shadow overflow-hidden">
-                                <div class="p-6">
-                                    <h3 class="text-lg font-medium text-gray-900">
-                                        <?php echo htmlspecialchars($article['title']); ?>
-                                    </h3>
-                                    <p class="mt-2 text-sm text-gray-600">
-                                        <?php echo htmlspecialchars(substr($article['content'], 0, 150)) . '...'; ?>
-                                    </p>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-sm text-gray-500">
-                                            <?php echo date('d/m/Y', strtotime($article['created_at'])); ?>
-                                        </span>
-                                        <div class="space-x-2">
-                                            <a href="edit-article.php?id=<?php echo $article['id']; ?>" 
-                                               class="text-indigo-600 hover:text-indigo-800">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="../../action/deletearticle.php?id=<?php echo $article['id']; ?>" 
-                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')"
-                                               class="text-red-600 hover:text-red-800">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Titre
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contenu
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Catégorie
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date de création
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Statut
+                </th>
+                <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <?php if ($articles && count($articles) > 0): ?>
+                <?php foreach ($articles as $article): ?>
+                    <tr>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">
+                                <?php echo htmlspecialchars($article['title']); ?>
                             </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="col-span-full text-center py-12 bg-white rounded-lg shadow">
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-500 max-w-xs truncate">
+                                <?php echo htmlspecialchars(substr($article['content'], 0, 100)) . '...'; ?>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-500">
+                                <?php echo htmlspecialchars($article['category_name'] ?? 'Non catégorisé'); ?>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">
+                                <?php echo date('d/m/Y', strtotime($article['created_at'])); ?>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                <?php echo $article['is_published'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
+                                <?php echo $article['is_published'] ? 'Publié' : 'Brouillon'; ?>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="edit-article.php?id=<?php echo $article['id']; ?>" 
+                               class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="../../action/deletearticle.php?id=<?php echo $article['id']; ?>" 
+                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')"
+                               class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center">
+                        <div class="text-center py-8">
                             <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
                             <p class="text-gray-600">Vous n'avez pas encore créé d'articles.</p>
-                            <a href="add-article.php" 
-                               class="mt-4 inline-block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                            <button onclick="document.getElementById('articleModal').classList.remove('hidden')"
+                                    class="mt-4 inline-block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
                                 Créer mon premier article
-                            </a>
+                            </button>
                         </div>
-                    <?php endif; ?>
-                </div>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
             </main>
         </div>
     </div>
@@ -189,6 +235,81 @@ $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
 <!-- Add this JavaScript for handling modal close when clicking outside -->
 <script>
 document.getElementById('categoryModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+    }
+});
+</script>
+<div id="articleModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-[800px] shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Ajouter un Article</h3>
+            
+            <!-- Form -->
+            <form action="../../action/addArticle.php" method="POST" class="space-y-4">
+                <!-- Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
+                    <input type="text" name="title" id="title" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label for="category_id" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <select name="category_id" id="category_id" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Sélectionnez une catégorie</option>
+                        <?php 
+                            foreach($categories as $category): ?>
+                                <option value="<?php echo $category['id']; ?>">
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </option>
+                            <?php endforeach;
+                     
+                        ?>
+                    </select>
+                </div>
+                
+                <!-- Content -->
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                    <textarea name="content" id="content" rows="6" required
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <!-- Published Status -->
+                <div class="flex items-center">
+                    <input type="checkbox" name="is_published" id="is_published" value="1"
+                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <label for="is_published" class="ml-2 block text-sm text-gray-700">
+                        Publier immédiatement
+                    </label>
+                </div>
+
+                <!-- Hidden Fields -->
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['id_user']; ?>">
+
+                <!-- Buttons -->
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" 
+                            onclick="document.getElementById('articleModal').classList.add('hidden')"
+                            class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" name="addArticle"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                        Publier
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add this JavaScript for handling modal close when clicking outside -->
+<script>
+document.getElementById('articleModal').addEventListener('click', function(e) {
     if (e.target === this) {
         this.classList.add('hidden');
     }
