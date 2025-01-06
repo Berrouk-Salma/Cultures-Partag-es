@@ -1,46 +1,38 @@
 <?php
-require_once '../classes/database.php';
-require_once '../classes/user.php';
-
 session_start();
+include_once '../classes/user.php';
 
-$error = '';
-$success = '';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    // Basic validation
-    if ($password !== $confirm_password) {
-        $error = 'Les mots de passe ne correspondent pas';
-    } else {
-        $user = new User();
-        
-        // Check if email already exists
-        if ($user->emailExists($email)) {
-            $error = 'Cet email est déjà utilisé';
-        } else {
-            // Create user
-            $userData = [
-                'name' => $name,
-                'email' => $email,
-                'password' => $password,
-                'role' => 'user'  // Default role
-            ];
-
-            if ($user->create($userData)) {
-                $success = 'Compte créé avec succès! Vous pouvez maintenant vous connecter.';
-                // Redirect after 2 seconds
-                header("refresh:2;url=login.php");
-            } else {
-                $error = 'Erreur lors de la création du compte';
-            }
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['signup'])) {
+        die("Accès non autorisé.");
     }
+
+$userData = [
+    'nom' => $_POST['nom'] ?? '',
+    'prenom' => $_POST['prenom'] ?? '',
+    'email' => $_POST['email'] ?? '',
+    'password' => $_POST['password'] ?? '',
+    'role' => $_POST['role'] ?? ''
+];
+echo "<pre>";
+print_r($userData);
+echo "</pre>";
+$newUser = new User();
+$inscription = $newUser->register(
+    $userData['nom'],
+    $userData['prenom'], 
+    $userData['email'],
+    $userData['password'],
+    $userData['role']
+);
+
+if (!$inscription) {
+    die("Échec de l'inscription.");
 }
+
+header("Location: login.php");
+
+exit;}
 ?>
 
 <!DOCTYPE html>
@@ -48,70 +40,83 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription - ArtCulture</title>
+    <title>Inscription - CultureConnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="max-w-lg w-full space-y-6 bg-white p-8 rounded-xl shadow-xl">
             <div class="text-center">
-                <h2 class="text-3xl font-bold text-gray-900">Créer un compte</h2>
-                <p class="mt-2 text-gray-600">Rejoignez la communauté ArtCulture</p>
+                <h2 class="text-3xl font-bold text-gray-800">Créer un compte</h2>
+                <p class="mt-2 text-gray-600">Rejoignez notre communauté</p>
             </div>
 
-            <?php if($error): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    <?php echo htmlspecialchars($error); ?>
+            <?php if (isset($error)): ?>
+                <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                    <p class="text-sm text-red-700"><?php echo htmlspecialchars($error); ?></p>
                 </div>
             <?php endif; ?>
 
-            <?php if($success): ?>
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    <?php echo htmlspecialchars($success); ?>
-                </div>
-            <?php endif; ?>
-
-            <form class="mt-8 space-y-6" method="POST" action="">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nom complet</label>
-                    <input type="text" id="name" name="name" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" name="email" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                    <input type="password" id="password" name="password" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <form method="POST" class="mt-8 space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Prénom</label>
+                        <input type="text" 
+                               name="prenom" 
+                               required 
+                               class="mt-1 w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nom</label>
+                        <input type="text" 
+                               name="nom" 
+                               required 
+                               class="mt-1 w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
                 </div>
 
+            
+
                 <div>
-                    <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required 
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" 
+                           name="email" 
+                           required 
+                           class="mt-1 w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
 
                 <div>
-                    <button type="submit" 
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        S'inscrire
-                    </button>
+                    <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                    <input type="password" 
+                           name="password" 
+                           required 
+                           class="mt-1 w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Type de compte</label>
+                    <select name="role" 
+                            required 
+                            class="mt-1 w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="user">Utilisateur</option>
+                        <option value="author">Auteur</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <button type="submit" 
+                        name="signup"
+                        class="mt-6 w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                    S'inscrire
+                </button>
             </form>
 
-            <div class="text-center mt-4">
-                <p class="text-sm text-gray-600">
-                    Déjà inscrit? 
-                    <a href="login.php" class="font-medium text-indigo-600 hover:text-indigo-500">
-                        Se connecter
-                    </a>
-                </p>
-            </div>
+            <p class="text-center text-sm text-gray-600">
+                Déjà inscrit? 
+                <a href="login.php" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
+                    Se connecter
+                </a>
+            </p>
         </div>
     </div>
 </body>

@@ -31,46 +31,46 @@ CREATE TABLE articles (
 );
 
 
--- Insert sample data into users
--- INSERT INTO users (name, email, password, role) 
--- VALUES 
---     ('Yasmine Khalil', 'yasmine@example.com', '$2y$10$encrypted1', 'admin'),
---     ('Kamal Rafi', 'kamal@example.com', '$2y$10$encrypted2', 'author'),
---     ('Leila Mokhtar', 'leila@example.com', '$2y$10$encrypted3', 'author'),
---     ('Hamza Tadili', 'hamza@example.com', '$2y$10$encrypted4', 'user'),
---     ('Nour Belkadi', 'nour@example.com', '$2y$10$encrypted5', 'user');
+Insert sample data into users
+INSERT INTO users (name, email, password, role) 
+VALUES 
+    ('Yasmine Khalil', 'yasmine@example.com', '$2y$10$encrypted1', 'admin'),
+    ('Kamal Rafi', 'kamal@example.com', '$2y$10$encrypted2', 'author'),
+    ('Leila Mokhtar', 'leila@example.com', '$2y$10$encrypted3', 'author'),
+    ('Hamza Tadili', 'hamza@example.com', '$2y$10$encrypted4', 'user'),
+    ('Nour Belkadi', 'nour@example.com', '$2y$10$encrypted5', 'user');
 
--- -- Insert sample categories with more diverse content
--- INSERT INTO categories (name, description) 
--- VALUES 
---     ('Tech Innovations', 'Exploring cutting-edge technological advancements and their impact'),
---     ('Career Growth', 'Professional development strategies and workplace success'),
---     ('Digital Art', 'Contemporary digital artistic expressions and techniques'),
---     ('Future Skills', 'Essential skills for the evolving professional landscape'),
---     ('Sustainable Living', 'Practical approaches to environmental consciousness');
+-- Insert sample categories with more diverse content
+INSERT INTO categories (name, description) 
+VALUES 
+    ('Tech Innovations', 'Exploring cutting-edge technological advancements and their impact'),
+    ('Career Growth', 'Professional development strategies and workplace success'),
+    ('Digital Art', 'Contemporary digital artistic expressions and techniques'),
+    ('Future Skills', 'Essential skills for the evolving professional landscape'),
+    ('Sustainable Living', 'Practical approaches to environmental consciousness');
 
--- -- Insert sample articles with varied status
--- INSERT INTO articles (title, content, user_id, category_id, is_published, published_at) 
--- VALUES 
---     ('The Rise of AI in Creative Industries', 
---      'Detailed exploration of how artificial intelligence is transforming creative processes...', 
---      2, 1, TRUE, CURRENT_TIMESTAMP),
---     ('Building a Sustainable Career Path', 
---      'Strategic approaches to long-term career development in the modern workplace...', 
---      3, 2, TRUE, CURRENT_TIMESTAMP),
---     ('Digital Art Revolution', 
---      'How digital tools are reshaping artistic expression and creativity...', 
---      2, 3, TRUE, CURRENT_TIMESTAMP),
---     ('Essential Skills for 2025', 
---      'Analysis of crucial competencies needed in the near future...', 
---      3, 4, FALSE, NULL),
---     ('Eco-Friendly Tech Solutions', 
---      'Innovative technological solutions for environmental challenges...', 
---      2, 5, TRUE, CURRENT_TIMESTAMP);
+-- Insert sample articles with varied status
+INSERT INTO articles (title, content, user_id, category_id, is_published, published_at) 
+VALUES 
+    ('The Rise of AI in Creative Industries', 
+     'Detailed exploration of how artificial intelligence is transforming creative processes...', 
+     2, 1, TRUE, CURRENT_TIMESTAMP),
+    ('Building a Sustainable Career Path', 
+     'Strategic approaches to long-term career development in the modern workplace...', 
+     3, 2, TRUE, CURRENT_TIMESTAMP),
+    ('Digital Art Revolution', 
+     'How digital tools are reshaping artistic expression and creativity...', 
+     2, 3, TRUE, CURRENT_TIMESTAMP),
+    ('Essential Skills for 2025', 
+     'Analysis of crucial competencies needed in the near future...', 
+     3, 4, FALSE, NULL),
+    ('Eco-Friendly Tech Solutions', 
+     'Innovative technological solutions for environmental challenges...', 
+     2, 5, TRUE, CURRENT_TIMESTAMP);
 
--- Advanced Select Queries
+Advanced Select Queries
 
--- 1. Get trending articles with author info and engagement metrics
+1. Get trending articles with author info and engagement metrics
 SELECT 
     a.title,
     u.name AS author,

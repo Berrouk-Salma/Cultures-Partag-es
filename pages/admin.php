@@ -7,10 +7,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-require_once '../classes/database.php';
-require_once '../classes/article.php';
-require_once '../classes/category.php';
-require_once '../classes/user.php';
+require_once  __DIR__ . '/../classes/db.php';
+require_once  __DIR__ . '/../classes/article.php';
+require_once  __DIR__ . '/../classes/category.php';
+require_once  __DIR__ . '/../classes/user.php';
 
 $articleObj = new Article();
 $categoryObj = new Category();

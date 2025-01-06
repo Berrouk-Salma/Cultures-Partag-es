@@ -6,9 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once '../classes/database.php';
-require_once '../classes/article.php';
-require_once '../classes/category.php';
+require_once  __DIR__ . '/../classes/db.php';
+require_once  __DIR__ . '/../classes/article.php';
+require_once  __DIR__ . '/../classes/category.php';
 
 $articleObj = new Article();
 $categoryObj = new Category();

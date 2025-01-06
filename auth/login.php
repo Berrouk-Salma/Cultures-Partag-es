@@ -1,22 +1,39 @@
 <?php
 session_start();
-require_once '../classes/database.php';
-require_once '../classes/user.php';
+include_once '../config/db.php';
+include_once "../classes/user.php";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'];
+if(isset($_POST['login']) && $_SERVER['REQUEST_METHOD']==='POST') {
+    $emailInput = trim($_POST['email']);
+    $pwd = $_POST['password'];
+
+    if (!$emailInput || !$pwd) {
+        die("Veuillez remplir tous les champs.");
+    }
     
-    $user = new User();
-    $result = $user->login($email, $password);
+    $utilisateur = new User();
+    $connexion = $utilisateur->login($emailInput, $pwd);
     
-    if ($result) {
-        $_SESSION['user_id'] = $result['id'];
-        $_SESSION['role'] = $result['role'];
-        header('Location: ../index.php');
-        exit();
-    } else {
-        $error = "Email ou mot de passe incorrect";
+    if (!$connexion) {
+        die("Identifiants incorrects.");
+    }
+    
+    $_SESSION['id_user'] = $connexion->getId();
+    $_SESSION['prenom'] = $connexion->getPrenom();
+    $_SESSION['nom'] = $connexion->getNom();
+    $_SESSION['email'] = $connexion->getEmail();
+    //$_SESSION['phone'] = $connexion->getTelephone();
+    $_SESSION['role'] = $connexion->getRole();
+    var_dump($_SESSION['id_user']);
+    $dashboard = [
+        'Admin' => '../views/admin/dashboard.php',
+        'author' => '../views/author/dashboard.php',
+        'user' => '../index.php'
+    ];
+
+    if (isset($dashboard[$_SESSION['role']])) {
+        header("Location: " . $dashboard[$_SESSION['role']]);
+        exit;
     }
 }
 ?>
@@ -40,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-            <form class="mt-8 space-y-6" method="POST">
+            <form class="mt-8 space-y-6" method="POST" >
                 <div class="space-y-4">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -54,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
                 <div>
-                    <button type="submit" 
+                    <button type="submit" name="login"
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Se connecter
                     </button>

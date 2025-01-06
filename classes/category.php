@@ -1,95 +1,130 @@
 <?php
+
+require_once __DIR__ . '/../config/db.php';
+
 class Category {
-    private $db;
+    
+    private int $id_categorie;
+    private string $nom;
+    private string $description;
+    private string $date_creation;
+    private Database $database;
 
     public function __construct() {
-        $this->db = new Database();
+        $this->database = new Database();
     }
 
-    public function create($name, $description = null) {
-        try {
-            $sql = "INSERT INTO categories (name, description) VALUES (:name, :description)";
-            $stmt = $this->db->prepare($sql);
-            
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':description', $description);
-            
-            $stmt->execute();
-            return $this->db->lastInsertId();
-        } catch(PDOException $e) {
-            error_log("Error creating category: " . $e->getMessage());
-            return false;
-        }
+    // GETTERS avec return types
+    public function getId(): int {
+        return $this->id_categorie;
     }
 
-    public function getAll() {
+    public function getName(): string {
+        return $this->nom;
+    }
+
+    public function getDescription(): string {
+        return $this->description;
+    }
+
+    public function getDate(): string {
+        return $this->date_creation;
+    }
+
+    // SETTERS avec void return type
+    public function setId(int $id): void {
+        $this->id_categorie = $id;
+    }
+
+    public function setName(string $nom): void {
+        $this->nom = $nom;
+    }
+
+    public function setDescription(string $description): void {
+        $this->description = $description;
+    }
+
+    public function setDate(string $date): void {
+        $this->date_creation = $date;
+    }
+
+    // Récupérer toutes les catégories
+    public function getAll(): array {
         try {
-            $sql = "SELECT c.*, COUNT(a.id) as article_count 
-                    FROM categories c 
-                    LEFT JOIN articles a ON c.id = a.category_id 
-                    GROUP BY c.id 
-                    ORDER BY c.name";
-            $stmt = $this->db->prepare($sql);
+            $query = "SELECT C.*, COUNT(A.id_article) as nbr_articles 
+                     FROM categorie C
+                     LEFT JOIN article A ON C.id_categorie = A.id_categorie
+                     GROUP BY C.id_categorie
+                     ORDER BY C.nom_categorie ASC";
+                     
+            $stmt = $this->database->getConnection()->prepare($query);
             $stmt->execute();
-            return $stmt->fetchAll();
+            
+            return ($stmt->rowCount() > 0) ? $stmt->fetchAll(PDO::FETCH_ASSOC) : false;
+            
         } catch(PDOException $e) {
-            error_log("Error getting categories: " . $e->getMessage());
+            $this->logError('allCategories', $e->getMessage());
             return [];
         }
     }
 
-    public function getById($id) {
+    // Récupérer une catégorie
+    public function showCategorie(int $id): array|false {
         try {
-            $sql = "SELECT * FROM categories WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-            return $stmt->fetch();
-        } catch(PDOException $e) {
-            error_log("Error getting category: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function update($id, $name, $description = null) {
-        try {
-            $sql = "UPDATE categories SET name = :name, description = :description 
-                    WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            $query = "SELECT * 
+                     FROM categorie 
+                     WHERE id_categorie = :id";
+                     
+            $stmt = $this->database->getConnection()->prepare($query);
+            $stmt->execute(['id' => $id]);
             
-            $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':description', $description);
+            return ($stmt->rowCount() > 0) ? $stmt->fetch(PDO::FETCH_ASSOC) : false;
             
-            return $stmt->execute();
         } catch(PDOException $e) {
-            error_log("Error updating category: " . $e->getMessage());
+            $this->logError('showCategorie', $e->getMessage());
             return false;
         }
     }
 
-    public function delete($id) {
+    // Distribution des articles par catégorie
+    public function distributeCategories(int $id_auteur): array|false {
         try {
-            $sql = "DELETE FROM categories WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            return $stmt->execute();
+            $query = "SELECT 
+                        C.nom_categorie,
+                        COUNT(A.id_article) AS nbr_articles,
+                        MAX(A.date_publication) as dernier_article
+                     FROM article A 
+                     JOIN categorie C ON A.id_categorie = C.id_categorie 
+                     WHERE A.id_auteur = :id_auteur
+                     GROUP BY C.nom_categorie 
+                     ORDER BY nbr_articles DESC";
+                     
+            $stmt = $this->database->getConnection()->prepare($query);
+            $stmt->execute(['id_auteur' => $id_auteur]);
+            
+            return ($stmt->rowCount() > 0) ? $stmt->fetchAll(PDO::FETCH_ASSOC) : false;
+            
         } catch(PDOException $e) {
-            error_log("Error deleting category: " . $e->getMessage());
+            $this->logError('distributeCategories', $e->getMessage());
             return false;
         }
     }
 
-    public function getArticleCount($id) {
+    // Helper method pour logging
+    private function logError(string $method, string $message): void {
+        error_log("Categorie::{$method} Error: {$message}");
+    }
+
+    // Vérifier si une catégorie existe
+    public function exists(int $id): bool {
         try {
-            $sql = "SELECT COUNT(*) FROM articles WHERE category_id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-            return $stmt->fetchColumn();
+            $query = "SELECT COUNT(*) FROM categorie WHERE id_categorie = :id";
+            $stmt = $this->database->getConnection()->prepare($query);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetchColumn() > 0;
         } catch(PDOException $e) {
-            error_log("Error counting articles: " . $e->getMessage());
-            return 0;
+            $this->logError('exists', $e->getMessage());
+            return false;
         }
     }
 }

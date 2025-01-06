@@ -15,7 +15,7 @@ $categories = $categoryObj->getAll();
 
 
 session_start();
-$isLoggedIn = isset($_SESSION['id_user']);
+$isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $isLoggedIn ? $_SESSION['role'] : null;
 ?>
 
@@ -47,8 +47,10 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : null;
                             <a href="admin/dashboard.php" class="text-indigo-600 hover:text-indigo-800">Dashboard</a>
                         <?php endif; ?>
                         <a href="auth/logout.php" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Déconnexion</a>
+                    <?php else: ?>
+                        <a href="auth/login.php" class="text-indigo-600 hover:text-indigo-800">Connexion</a>
+                        <a href="auth/register.php" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Inscription</a>
                     <?php endif; ?>
-                   
                 </div>
             </div>
         </div>
