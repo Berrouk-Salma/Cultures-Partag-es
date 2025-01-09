@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addArticle'])) {
         }
 
         // Check if category exists and belongs to user
-        $checkStmt = $conn->prepare("SELECT id FROM categories WHERE id = ? AND user_id = ?");
-        $checkStmt->execute([$category_id, $_SESSION['id_user']]);
+        $checkStmt = $conn->prepare("SELECT id FROM categories WHERE id = ?");
+        $checkStmt->execute([$category_id]);
         if ($checkStmt->rowCount() === 0) {
             $_SESSION['error'] = "Catégorie invalide.";
             header("Location: " . $_SERVER['HTTP_REFERER']);

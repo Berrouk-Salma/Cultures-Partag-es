@@ -20,17 +20,23 @@ class Article {
     
     public function getArticlesByStatus(string $status) {
         try {
-            $sql = "SELECT * 
-                    FROM article A 
-                    JOIN categorie C ON A.id_categorie = C.id_categorie
-                    JOIN users U ON U.id_user = A.id_auteur 
-                    WHERE A.etat = :status 
-                    ORDER BY A.date_publication DESC";
+            $sql = "SELECT * , C.name AS category_name , A.created_at AS date_pub
+                    FROM categories C 
+                    JOIN articles A ON A.category_id = C.id
+                    JOIN users U ON U.id = A.user_id 
+                    WHERE A.etat = :status";
                     
             $stmt = $this->database->getConnection()->prepare($sql);
-            $stmt->execute(['status' => $status]);
+            $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+            $stmt->execute();
+
+
             
-            return ($stmt->rowCount() > 0) ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            // return ($stmt->rowCount() > 0) ? 
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC) ;
+            // : [];
+
+            return $result ;
             
         } catch(PDOException $e) {
             $this->logError('getArticlesByStatus', $e->getMessage());

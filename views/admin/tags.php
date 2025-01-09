@@ -33,7 +33,7 @@ try {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-<?php include __DIR__ . '/../../includes/admin_header.php'; ?>
+
 
     <div class="container mx-auto px-4 py-8">
         <div class="flex justify-between items-center mb-6">

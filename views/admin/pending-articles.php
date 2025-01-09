@@ -16,6 +16,8 @@ $conn = $database->getConnection();
 $articles = new Article();
 $pend = $articles->getArticlesByStatus('pending'); // Fetch pending articles
 
+// print_r($pend);
+
 ?>
 
 <!DOCTYPE html>
@@ -125,39 +127,39 @@ $pend = $articles->getArticlesByStatus('pending'); // Fetch pending articles
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <?php if (!empty($pend)): ?>
-                            <?php foreach ($pend as $article): ?>
+                            <?php foreach ($pend as $pd): ?>
                                 <tr>
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($article['title']); ?>
+                                            <?php echo htmlspecialchars($pd['title']); ?>
                                         </div>
                                         <div class="text-sm text-gray-500 truncate max-w-xs">
-                                            <?php echo htmlspecialchars(substr($article['content'], 0, 100)) . '...'; ?>
+                                            <?php echo htmlspecialchars(substr($pd['content'], 0, 100)) . '...'; ?>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-900">
-                                            <?php echo htmlspecialchars($article['prenom'] . ' ' . $article['nom']); ?>
+                                            <?php echo htmlspecialchars($pd['name'] . ' ' . $pd['lastname']); ?>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            <?php echo htmlspecialchars($article['category_name']); ?>
+                                            <?php echo htmlspecialchars($pd['category_name']); ?>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <?php echo date('d/m/Y H:i', strtotime($article['created_at'])); ?>
+                                        <?php echo date('d/m/Y H:i', strtotime($pd['date_pub'])); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="#" onclick="viewArticle(<?php echo $article['id']; ?>)" 
+                                        <a href="#" onclick="viewArticle(<?php echo $pd['id']; ?>)" 
                                            class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="../../action/approveArticle.php?id=<?php echo $article['id']; ?>" 
+                                        <a href="../../action/approveArticle.php?id=<?php echo $pd['id']; ?>" 
                                            class="text-green-600 hover:text-green-900 mr-3">
                                             <i class="fas fa-check"></i>
                                         </a>
-                                        <a href="../../action/rejectArticle.php?id=<?php echo $article['id']; ?>" 
+                                        <a href="../../action/rejectArticle.php?id=<?php echo $pd['id']; ?>" 
                                            onclick="return confirm('Êtes-vous sûr de vouloir rejeter cet article ?')"
                                            class="text-red-600 hover:text-red-900">
                                             <i class="fas fa-times"></i>
