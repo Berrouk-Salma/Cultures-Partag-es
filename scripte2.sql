@@ -1,5 +1,5 @@
 -- CREATION DE LA BASE DE DONNEES culture_connect
-CREATE DATABASE culture_connect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;; 
+CREATE DATABASE art_culture_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;; 
 
 USE culture_connect;
 
@@ -25,7 +25,7 @@ CREATE TABLE categorie(
     FOREIGN KEY (id_admin) REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE article( 
+CREATE TABLE articles ( 
     id_article INT AUTO_INCREMENT PRIMARY KEY, 
     titre VARCHAR(100) NOT NULL, 
     contenu TEXT NOT NULL, 
