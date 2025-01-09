@@ -24,17 +24,17 @@ if(isset($_POST['login']) && $_SERVER['REQUEST_METHOD']==='POST') {
     $_SESSION['email'] = $connexion->getEmail();
     //$_SESSION['phone'] = $connexion->getTelephone();
     $_SESSION['role'] = $connexion->getRole();
-    var_dump($_SESSION['id_user']);
+    echo($_SESSION['role']);
     $dashboard = [
-        'Admin' => '../views/admin/dashboard.php',
+        'admin' => '../views/admin/dashboard.php',
         'author' => '../views/author/dashboard.php',
         'user' => '../index.php'
     ];
 
-    if (isset($dashboard[$_SESSION['role']])) {
+    // if (isset($dashboard[$_SESSION['role']])) {
         header("Location: " . $dashboard[$_SESSION['role']]);
         exit;
-    }
+    // }
 }
 ?>
 

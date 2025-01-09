@@ -15,7 +15,7 @@ $userData = [
     'role' => $_POST['role'] ?? ''
 ];
 echo "<pre>";
-print_r($userData);
+// print_r($userData);
 echo "</pre>";
 $newUser = new User();
 $inscription = $newUser->register(
@@ -25,14 +25,16 @@ $inscription = $newUser->register(
     $userData['password'],
     $userData['role']
 );
+// print_r($inscription);
 
 if (!$inscription) {
     die("Échec de l'inscription.");
 }
 
-header("Location: login.php");
+// header("Location: login.php");
 
-exit;}
+// exit;
+}
 ?>
 
 <!DOCTYPE html>

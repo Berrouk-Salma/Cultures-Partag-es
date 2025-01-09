@@ -11,7 +11,7 @@ $article = new Article();
 $articles = $article->getArticlesByAuthor($_SESSION['id_user']);
 
 $category = new Category();
-$categories = $category->getCategorie($_SESSION['id_user']);
+$categories = $category->getAll();
 ?>
 
 <!DOCTYPE html>
@@ -164,7 +164,7 @@ $categories = $category->getCategorie($_SESSION['id_user']);
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="edit-article.php?id=<?php echo $article['id']; ?>" 
+                            <a href="../../action/edit-article.php?id=<?php echo $article['id']; ?>" 
                                class="text-indigo-600 hover:text-indigo-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
@@ -261,9 +261,11 @@ document.getElementById('categoryModal').addEventListener('click', function(e) {
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Sélectionnez une catégorie</option>
                         <?php 
-                            foreach($categories as $category): ?>
-                                <option value="<?php echo $category['id']; ?>">
-                                    <?php echo htmlspecialchars($category['name']); ?>
+                            $category = new Category();
+                            $categories = $category->getAll();
+                            foreach($categories as $ctg): ?>
+                                <option value="<?php echo $ctg['id']; ?>">
+                                    <?php echo htmlspecialchars($ctg['name']); ?>
                                 </option>
                             <?php endforeach;
                      

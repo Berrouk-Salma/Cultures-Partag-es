@@ -123,21 +123,23 @@ class User {
     protected function logError(string $method, string $message): void {
         error_log("User::{$method} Error: {$message}");
     }
-    public function register(string $nom, string $prenom,string $email,string $password,string $role = 'user'){
+
+    public function register(string $nom, string $prenom,string $email,string $password,string $role){
         $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $this->database->getConnection()->prepare($sql);
         $stmt->bindParam(":email", $email, PDO::PARAM_STR);
         $stmt->execute();
         
         if($stmt->rowCount() > 0){
-            header("location: ../auth/login.php");
+            // header("location: ../auth/login.php");
+            print_r($stmt);
         }
         
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         
         try {
             $test = $this->database->getConnection();
-            $stmt = $test->prepare("INSERT INTO users (lastname, name, email, password, role) VALUES (:prenom, :nom,, :email, :pw , :role)");
+            $stmt = $test->prepare("INSERT INTO users (lastname, name, email, password, role) VALUES (:prenom, :nom, :email, :pw , :role)");
             $stmt->bindParam(":prenom", $prenom, PDO::PARAM_STR);
             $stmt->bindParam(":nom", $nom, PDO::PARAM_STR);
             $stmt->bindParam(":email", $email, PDO::PARAM_STR);
@@ -152,7 +154,7 @@ class User {
             } else {
                 // Failed to create user
                 $_SESSION['error'] = "Erreur lors de la création du compte.";
-                header("Location: ../auth/register.php");
+                // header("Location: ../auth/register.php");
             }
     
         } catch (PDOException $e) {

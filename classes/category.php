@@ -51,11 +51,8 @@ class Category {
     // Récupérer toutes les catégories
     public function getAll(): array {
         try {
-            $query = "SELECT C.*, COUNT(A.id_article) as nbr_articles 
-                     FROM categorie C
-                     LEFT JOIN article A ON C.id_categorie = A.id_categorie
-                     GROUP BY C.id_categorie
-                     ORDER BY C.nom_categorie ASC";
+            $query = "SELECT C.*
+                     FROM categories C";
                      
             $stmt = $this->database->getConnection()->prepare($query);
             $stmt->execute();

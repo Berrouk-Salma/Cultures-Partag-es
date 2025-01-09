@@ -12,12 +12,13 @@ class Article {
     private string $title;
     private string $content;
     private string $date_pub;
+
     
     public function __construct() {
         $this->database = new Database();
     }
     
-    private function getArticlesByStatus(string $status) {
+    public function getArticlesByStatus(string $status) {
         try {
             $sql = "SELECT * 
                     FROM article A 
