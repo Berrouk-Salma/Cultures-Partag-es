@@ -58,14 +58,14 @@ if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Check if article ID is provided
-if (!isset($_POST['article_id'])) {
+if (!isset($_GET['id'])) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'ID de l\'article manquant']);
     exit();
 }
 
 try {
-    $articleId = (int)$_POST['article_id'];
+    $articleId = (int)$_GET['id'];
     
     $database = new Database();
     $articleManager = new ArticleManager($database->getConnection());

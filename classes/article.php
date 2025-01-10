@@ -20,7 +20,7 @@ class Article {
     
     public function getArticlesByStatus(string $status) {
         try {
-            $sql = "SELECT * , C.name AS category_name , A.created_at AS date_pub
+            $sql = "SELECT * , C.name AS category_name , A.created_at AS date_pub, A.id AS id_article
                     FROM categories C 
                     JOIN articles A ON A.category_id = C.id
                     JOIN users U ON U.id = A.user_id 

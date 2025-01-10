@@ -155,7 +155,7 @@ $pend = $articles->getArticlesByStatus('pending'); // Fetch pending articles
                                            class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="../../action/approveArticle.php?id=<?php echo $pd['id']; ?>" 
+                                        <a href="../../action/approveArticle.php?id=<?php echo $pd['id_article']; ?>" 
                                            class="text-green-600 hover:text-green-900 mr-3">
                                             <i class="fas fa-check"></i>
                                         </a>
