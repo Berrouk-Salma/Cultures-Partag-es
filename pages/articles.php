@@ -1,11 +1,5 @@
 <?php
 session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../auth/login.php');
-    exit();
-}
-
 require_once  __DIR__ . '/../config/db.php';
 require_once  __DIR__ . '/../classes/article.php';
 require_once  __DIR__ . '/../classes/category.php';
