@@ -173,4 +173,53 @@ class Article {
             return false;
         }
     }
+    
+    public function ShowAllArticles() {
+        try {
+            $sql = "SELECT 
+                        a.id AS article_id,
+                        a.title AS article_title,
+                        a.content AS article_content,
+                        a.created_at AS article_created_at,
+                        a.updated_at AS article_updated_at,
+                        a.is_published AS article_status,
+                        a.published_at AS article_published_at,
+                        u.name AS author_name, 
+                        c.name AS category_name,
+                        COUNT(l.id) AS total_likes
+                    FROM 
+                        articles a
+                    INNER JOIN 
+                        users u ON a.user_id = u.id 
+                    INNER JOIN 
+                        categories c ON a.category_id = c.id 
+                    LEFT JOIN 
+                        likes l ON l.article_id = a.id
+                    WHERE 
+                        a.is_published = TRUE
+                    GROUP BY 
+                        a.id, u.name, c.name
+                    ORDER BY 
+                        a.published_at DESC";
+    
+            $stmt = $this->database->getConnection()->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Debug the result
+            if ($result) {
+                error_log(print_r($result, true)); // Log the result to check what's returned
+            } else {
+                error_log("No articles found or query failed.");
+            }
+    
+            return $result ?: []; // Return empty array if no result is found
+    
+        } catch (PDOException $e) {
+            $this->logError('ShowAllArticles', $e->getMessage());
+            return [];
+        }
+    }
+    
+    
 }
